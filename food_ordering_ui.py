@@ -43,11 +43,77 @@ def show_main_menu():
             manager_menu()
 
 def print_check(your_order):
-    print("\nYour order:")
-    print('Your check')  
+    """
+    Prints the list of items ordered, extended price, total, taxes, and grand total.
+    """
+    TAX_RATE = 0.07  # Assuming a tax rate of 7%
+    
+    if not your_order:
+        print("No items ordered.")
+        return
+
+    print("\nYour Order:")
+    total = 0
+    for item_code, quantity in your_order:
+        quantity = int(quantity)
+        for menu_item in data.menu_dict:
+            if menu_item['code'] == item_code:
+                item_total = menu_item['price'] * quantity
+                total += item_total
+                print(f"{menu_item['name']} (x{quantity}) - ${menu_item['price']} each - Total: ${item_total}")
+    
+    tax = total * TAX_RATE
+    grand_total = total + tax
+
+    print(f"\nSubtotal: ${total:.2f}")
+    print(f"Tax: ${tax:.2f}")
+    print(f"Grand Total: ${grand_total:.2f}")  
 
 def change_order(your_order):
-    print("Change the order:")
+    """
+    Allows the user to modify the current order by changing quantity or removing items.
+    """
+    if not your_order:
+        print("Your order is currently empty.")
+        return your_order
+
+    while True:
+        print("\nCurrent Order:")
+        for index, (item_code, quantity) in enumerate(your_order, start=1):
+            print(f"{index}. {item_code} - Quantity: {quantity}")
+        
+        print("\nOptions: ")
+        print("C to change an item quantity")
+        print("R to remove an item")
+        print("B to go back to the main menu")
+        
+        choice = input("Choose an option: ").upper()
+
+        if choice == 'C':
+            item_num = int(input("Enter the item number you want to change: ")) - 1
+            new_quantity = int(input("Enter new quantity: "))
+            if 0 <= item_num < len(your_order):
+                your_order[item_num] = (your_order[item_num][0], new_quantity)
+                print(f"Updated {your_order[item_num][0]} to quantity {new_quantity}.")
+            else:
+                print("Invalid item number.")
+        
+        elif choice == 'R':
+            item_num = int(input("Enter the item number you want to remove: ")) - 1
+            if 0 <= item_num < len(your_order):
+                removed_item = your_order.pop(item_num)
+                print(f"Removed {removed_item[0]} from your order.")
+            else:
+                print("Invalid item number.")
+        
+        elif choice == 'B':
+            break
+        
+        else:
+            print("Invalid choice. Please try again.")
+
+    return your_order
+
 
 def manager_menu():
     while True:
